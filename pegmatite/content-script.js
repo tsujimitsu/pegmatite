@@ -74,11 +74,18 @@ var siteProfiles = {
 		"extract": function (elem) {
 			return elem.innerText.trim();
 		}
+	},
+	"backlog.jp": {
+		"selector": "pre.lang-uml, pre.lang-puml, pre.lang-plantuml",
+		"extract": function (elem) {
+			return elem.innerText.trim();
+		}
 	}
 };
 
 chrome.storage.local.get("baseUrl", function(config) {
-	var siteProfile = siteProfiles[window.location.hostname] || siteProfiles["default"];
+	var hostname = window.location.hostname.split('.').slice(-2).join('.');
+	var siteProfile = siteProfiles[hostname] || siteProfiles["default"];
 	var baseUrl = config.baseUrl || "https://www.plantuml.com/plantuml/img/";
 	[].forEach.call(document.querySelectorAll(siteProfile.selector), function (umlElem) {
 		var plantuml = siteProfile.extract(umlElem);
