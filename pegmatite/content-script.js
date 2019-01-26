@@ -74,23 +74,56 @@ var siteProfiles = {
 		"extract": function (elem) {
 			return elem.innerText.trim();
 		}
+	},
+	"bitbucket.org": {
+		"selector": "div.codehilite.language-plantuml > pre",
+		"extract": function (elem) {
+			return elem.innerText.trim();
+		}
 	}
 };
 
-chrome.storage.local.get("baseUrl", function(config) {
-	var siteProfile = siteProfiles[window.location.hostname] || siteProfiles["default"];
+function run(config) {
+	var siteProfile =
+		siteProfiles[window.location.hostname] || siteProfiles["default"];
 	var baseUrl = config.baseUrl || "https://www.plantuml.com/plantuml/img/";
-	[].forEach.call(document.querySelectorAll(siteProfile.selector), function (umlElem) {
+	[].forEach.call(document.querySelectorAll(siteProfile.selector), function(
+		umlElem
+	) {
 		var plantuml = siteProfile.extract(umlElem);
 		if (plantuml.substr(0, "@start".length) !== "@start") return;
 		var plantUmlServerUrl = baseUrl + compress(plantuml);
-		if (plantUmlServerUrl.lastIndexOf("https", 0) === 0) { // if URL starts with "https"
+		if (plantUmlServerUrl.lastIndexOf("https", 0) === 0) {
+			// if URL starts with "https"
 			replaceElement(umlElem, plantUmlServerUrl);
 		} else {
 			// to avoid mixed-content
-			chrome.runtime.sendMessage({ "action": "plantuml", "url": plantUmlServerUrl }, function(dataUri) {
-				replaceElement(umlElem, dataUri);
-			});
+			chrome.runtime.sendMessage(
+				{ action: "plantuml", url: plantUmlServerUrl },
+				function(dataUri) {
+					replaceElement(umlElem, dataUri);
+				}
+			);
 		}
 	});
+}
+
+chrome.storage.local.get("baseUrl", function(config) {
+	if (window.location.hostname === "bitbucket.org") {
+		var observer = new MutationObserver(function() {
+			if (document.getElementsByClassName("language-plantuml").length > 0) {
+				run(config);
+				observer.disconnect();
+			}
+		});
+
+		observer.observe(document.body, {
+			attributes: true,
+			characterData: true,
+			childList: true,
+			subtree: true
+		});
+	}
+
+	run(config);
 });
