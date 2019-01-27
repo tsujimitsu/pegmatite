@@ -1,24 +1,25 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Pegmatite Options</title>
-  <meta charset="utf-8"/>
-  <style>
-    body: {
-      padding: 10px;
-    }
-  </style>
-</head>
-<body>
-<h1>Pegmatite Options</h1>
+  <head>
+    <title>Pegmatite Options</title>
+    <meta charset="utf-8" />
+    <style>
+      body: {
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Pegmatite Options</h1>
 
-<div>
-  <label>
-  Base URL: <input type="text" size="100" id="base_url">
-  </label>
-</div>
-<button id="save">Save</button> <span id="status"></span>
+    <div>
+      <label> Base URL: <input type="text" size="100" id="base_url" /> </label>
+      <label>
+        Basic Auth(base64): <input type="text" size="100" id="basic_auth" />
+      </label>
+    </div>
+    <button id="save">Save</button> <span id="status"></span>
 
-<script src="options.js"></script>
-</body>
+    <script src="options.js"></script>
+  </body>
 </html>
