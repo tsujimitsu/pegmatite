@@ -181,11 +181,28 @@ function run(config) {
 }
 
 chrome.storage.local.get("baseUrl", function(config) {
+	var observer;
 	if (window.location.hostname === "bitbucket.org") {
-		var observer = new MutationObserver(function() {
+		observer = new MutationObserver(function() {
 			if (document.getElementsByClassName("language-plantuml").length > 0) {
 				run(config);
 				observer.disconnect();
+			}
+		});
+
+		observer.observe(document.body, {
+			attributes: true,
+			characterData: true,
+			childList: true,
+			subtree: true
+		});
+	}
+
+	if (window.location.hostname === "github.com") {
+		observer = new MutationObserver(function() {
+			if (document.querySelectorAll("pre[lang='puml']").length > 0) {
+				run(config);
+				//observer.disconnect();
 			}
 		});
 
